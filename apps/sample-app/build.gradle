@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+    id 'org.sonarqube' version '5.1.0.4882'
+    id 'jacoco'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-rest'
+    implementation 'io.quarkus:quarkus-rest-jackson'
+    implementation 'io.quarkus:quarkus-arc'
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.rest-assured:rest-assured'
+}
+
+group 'com.example'
+version '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+jacocoTestReport {
+	dependsOn test // tests are required to run before generating the report
+	reports {
+		xml.required = true
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+}
+
+sonar {
+	properties {
+		property "sonar.projectKey", "sample-app"
+    property "sonar.projectName", "sample-app"
+    property "sonar.host.url", "http://sonarqube.iwamula-dev.svc.cluster.local:9000"
+		// property "sonar.host.url", "https://sonarqube-sonarqube.apps.rosa-pwb5w.ms9h.p1.openshiftapps.com"
+		property "sonar.login", "sqa_4e1e575b62c5df6a58405eb8c5b960c5f2f478f9"
+		property "sonar.junit.reportPaths", "build/test-results/test"
+	}
+}
